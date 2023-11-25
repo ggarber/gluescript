@@ -11,11 +11,10 @@ client.connect();
 export const rootHandler = (_req: Request, res: Response) => {
   const queueId = uuidv4();
   return res.send(`Ugliest page ever.   Your new personal queue id is ${queueId}\r\nMake a post request to /queue/${queueId}`);
-
 };
 
 export const getQueueHandler = async (req: Request, res: Response) => {
-  const items = await client.lRange('queue:1', 0, 99);
+  const items = await client.lRange('queue:' + req.params.queue, 0, 99);
 
   return res.send(items.join('\r\n'));
 };
@@ -26,5 +25,10 @@ export const postQueueHandler = async (req: Request, res: Response) => {
 
   await client.lPush('queue:' + req.params.queue, JSON.stringify(body));
   await client.lTrim('queue:' + req.params.queue, 0, 99);
+  return res.sendStatus(200);
+};
+
+export const deleteQueueHandler = async (req: Request, res: Response) => {
+  await client.lTrim('queue:' + req.params.queue, 0, 0);
   return res.sendStatus(200);
 };
