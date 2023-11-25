@@ -24,7 +24,7 @@ export const postQueueHandler = async (req: Request, res: Response) => {
   const body = req.body;
   console.log('body', body);
 
-  await client.lPush('queue:' + req.params.queue, body);
+  await client.lPush('queue:' + req.params.queue, JSON.stringify(body));
   await client.lTrim('queue:' + req.params.queue, 0, 99);
   return res.sendStatus(200);
 };
